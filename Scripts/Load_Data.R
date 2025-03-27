@@ -61,6 +61,38 @@ svy_pts <- st_read(paste0(filepath, "HEE_Overstory_Survey_Points_2017.shp"))
 svy_pts <- st_transform(svy_pts, 32616) # Project to WGS 84 UTM 16 N
 survey_pts <- subset(svy_pts, Unit == '2') # Subset for unit 2
 
+## Merge summary table with plot locations
 
+sum_u2 <- merge.data.frame(sum_u2, survey_pts, all.x = TRUE)
+unique(sum_u2$Plot)
+unique(survey_pts$Plot)
+
+# Convertin to sf format
+sum_u2 <- st_as_sf(sum_u2, coords = c("X", "Y"), crs = 32616)
+sum_u2
+
+# Creating buffers with radius of 17.83 since that is the radius of the cirular plot. 
+#?# Is buffer of a point always a circle by default? That makes sense since there is only one var (distance "radius" ) supplied to the buffer and no other geometric data other than the position of the point since it is dimensionless
+sf_plot <- st_buffer(sum_u2, dist = 17.83)
+plot(sf_plot)
+
+
+# CRS cheks
+crs(sf_plot , proj=T)
+crs(asp , proj=T)
+
+## transforming crs of plots to match images
+asp_crs <- crs(asp, proj = TRUE)
+sf_plot_crs <- st_transform(sf_plot, crs = asp_crs)
+
+
+## vis dominant species by aspect
+tm_shape(asp, alpha = 0.5) +
+  tm_raster(style = "cat", palette = c("white", "blue", "green", "yellow", "red"),
+            showNA = FALSE, alpha = 0.2, labels = c(NA, "North", "East", "South", "West")) +
+  tm_shape(sf_plot) +
+  tm_polygons('Common.name') +
+  tm_layout(legend.outside = TRUE, legend.outside.size = 0.2) +
+  tm_text("Plot", ymod = -0.9)
 
 
