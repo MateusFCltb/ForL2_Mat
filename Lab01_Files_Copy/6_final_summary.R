@@ -17,7 +17,7 @@
 # Implement this step to merge all relevant data into `sum_u2`.
 
 #----------------
-#sum_u2 <- sum_u2 %>%
+sum_u2 <- sum_u2 %>% left_join(dom_cnt, by = "Plot") %>% left_join(richness, by = "Plot")
 #----------------
 
 ### Step 6.1.1: Add Species Information and Rename Columns
@@ -35,9 +35,9 @@
 # Implement this step to add species information and rename columns.
 
 #----------------
-#sum_u2 <- sum_u2 %>%
+sum_u2 <- sum_u2 %>% left_join(species, by = c("Chojnacky_Code" = "Code")) %>% rename(Dom_species = Chojnacky_Code, Abundance = n)
 
-#sum_u2 <- sum_u2 %>% rename()
+sum_u2 <- sum_u2 %>% rename(Species = Common.name) 
 #----------------
 
 ### Step 6.3: Convert Biomass Units
@@ -51,7 +51,7 @@
 # Implement this step to convert biomass units.
 
 #----------------
-
+sum_u2 <- sum_u2 %>% mutate(biomass = biomass / 1000)
 #----------------
 
 ### Step 6.4: Apply Dominance Threshold
@@ -66,10 +66,10 @@
 # Implement this step to apply the dominance threshold.
 
 #----------------
-#sum_u2 <-
+sum_u2 <- sum_u2 %>% mutate(Dom_species = ifelse(rel_abd < 50, "Mixed", Dom_species))
 
 # Remove duplicate rows
-#sum_u2 <- 
+sum_u2 <- sum_u2 %>% distinct(Plot, .keep_all = TRUE)
 #----------------
 
 # Question 9: What’s the dominant species of plot D5 now? Compare with your previous answer.

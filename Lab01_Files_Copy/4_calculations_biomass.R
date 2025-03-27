@@ -46,7 +46,7 @@ trees <- trees %>% left_join(Bm_equa, by = "Chojnacky_Code")
 # Implement this step to calculate the biomass for each tree.
 
 #----------------
-trees <- trees %>% mutate(biomass = exp(b0.x + b1.x * log(DBH * 2.54)))
+trees <- trees %>% mutate(biomass = exp(b0 + b1 * log(DBH * 2.54)))
 #----------------
 
 ### Step 4.4: Filter Biomass Data
@@ -57,7 +57,7 @@ trees <- trees %>% mutate(biomass = exp(b0.x + b1.x * log(DBH * 2.54)))
 #   - For example, `filter(column != 0)` will keep all rows where the value in `column` is not zero.
 
 #----------------
-trees <- trees %>% filter(b0.x != 0 & b1.x != 0)
+trees <- trees %>% filter(b0 != 0 & b1 != 0)
 #----------------
 
 ### Step 4.5: Aggregate Biomass by Plot

@@ -57,7 +57,7 @@ dom_cnt <- tree_cnt %>% group_by(Plot) %>% filter(n == max(n))
 #----------------
 tree_total <- tree_cnt %>% group_by(Plot) %>% summarise(Ttl_Trees = sum(n))
 
-#richness <- tree_cnt %>%
+richness <- tree_cnt %>% group_by(Plot) %>% summarise(richness = n_distinct(Chojnacky_Code))
 #----------------
 
 # Merge the dominant species data with the total trees and richness data.
@@ -71,7 +71,7 @@ tree_total <- tree_cnt %>% group_by(Plot) %>% summarise(Ttl_Trees = sum(n))
 # Implement this step to merge the dominant species data with total trees and richness.
 
 #----------------
-#dom_cnt <- dom_cnt %>%
+dom_cnt <- dom_cnt %>% left_join(tree_total, by = "Plot") %>% left_join(richness, by = "Plot")
 #----------------
 
 # Question: What’s the most abundant species at plot D5?
@@ -85,16 +85,18 @@ tree_total <- tree_cnt %>% group_by(Plot) %>% summarise(Ttl_Trees = sum(n))
 #   - Round the relative abundance to one decimal place.
 
 #----------------
-#dom_cnt <- dom_cnt %>%
+dom_cnt <- dom_cnt %>% mutate(rel_abd = round((n / Ttl_Trees) * 100, 1))
 #----------------
 
 # Question 7: How many trees are there at plot A5?
+#### There are 24 trees
 # Question 8: How many different tree species are there at plot D1?
+### There are 7 different tree species in plot D1
 
 # Checkpoint: Review the Largest rel_abd Values
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Use the following code to verify your results:
-#head(dom_cnt %>% arrange(desc(rel_abd)))
+head(dom_cnt %>% arrange(desc(rel_abd)))
 
 #     # A tibble: 6 × 6
 #     # Groups:   Plot [6]
