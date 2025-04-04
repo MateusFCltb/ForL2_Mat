@@ -1,14 +1,15 @@
-install.packages("terra")
+#install.packages("terra")
 library(terra)
-install.packages("tmap")
+#install.packages("tmap")
 library(tmap)
-install.packages("sf")
+#install.packages("sf")
 library(sf)
 
-setwd("W:/ACADEMIC_Git/AGR333/ForL2")
+#setwd("W:/ACADEMIC_Git/AGR333/ForL2")
 
 ### Read in the inventory data
-filepath <- "W:/ACADEMIC_Git/AGR333/ForL2/files/"
+#filepath <- "W:/ACADEMIC_Git/AGR333/ForL2/files/"
+filepath <- "C:/Users/mateuscaltabiano/GitProjects/ForL2_Mat/files/"
 dem <- rast(paste0(filepath, "unit2.img"))
 dem
 df_dem <- as.data.frame(dem, xy = TRUE)
@@ -94,5 +95,73 @@ tm_shape(asp, alpha = 0.5) +
   tm_polygons('Common.name') +
   tm_layout(legend.outside = TRUE, legend.outside.size = 0.2) +
   tm_text("Plot", ymod = -0.9)
+
+
+
+#Q4 - dominant tree by slp
+ttm()
+tm_shape(slope, alpha = 0.5) +
+  tm_raster(style = "cont", alpha = 0.6, title = "Slope (deg)") +
+  tm_shape(sf_plot_crs) +  # use the CRS-matched object
+  tm_polygons('Common.name', title = "Dominant Species", alpha = 0.6) +
+  tm_layout(title = "Dominant Species by Slope",
+            legend.outside = TRUE, legend.outside.size = 0.2) +
+  tm_text("Plot", ymod = -0.9, size = 1.2)
+
+
+#q5 BA clustering
+
+ttm()
+tm_shape(asp, alpha = 0.5) +
+  tm_raster(style = "cat",
+            palette = c("white", "blue", "green", "yellow", "red"),
+            labels = c(NA, "North", "East", "South", "West"),
+            showNA = FALSE,
+            alpha = 0.2) +
+  tm_shape(sf_plot_crs) +
+  tm_polygons("BA", palette = "spectral", title = "Basal Area (sq_ft/acre)", alpha = 0.7) +
+  tm_layout(title = "Basal Area by Aspect",
+            legend.outside = TRUE,
+            legend.outside.size = 0.2) +
+  tm_text("Plot", ymod = -1.5, size = 1.2) +
+  tm_scale_bar()
+
+# q6 - TPA
+
+ttm()
+tm_shape(asp, alpha = 0.5) +
+  tm_raster(style = "cat",
+            palette = c("white", "blue", "green", "yellow", "red"),
+            labels = c(NA, "North", "East", "South", "West"),
+            showNA = FALSE,
+            alpha = 0.2) +
+  tm_shape(sf_plot_crs) +
+  tm_polygons("TPA", palette = "RdYlBu", title = "Trees Per Acre", alpha = 0.85) +
+  tm_layout(title = "Trees Per Acre (TPA) by Aspect",
+            legend.outside = TRUE,
+            legend.outside.size = 0.25) +
+  tm_text("Plot", ymod = -1.5, size = 1.2) +
+  tm_scale_bar()
+
+# q7 - biomass
+
+ttm()
+tm_shape(asp, alpha = 0.2) +
+  tm_raster(style = "cat",
+            palette = c("white", "blue", "green", "yellow", "red"),
+            labels = c(NA, "North", "East", "South", "West"),
+            showNA = FALSE,
+            alpha = 0.2) +
+  tm_shape(sf_plot_crs) +
+  tm_polygons("bm_tonpa",
+              title = "Biomass (tons/ac)",
+              palette = "spectral",
+              alpha = 1) +
+  tm_layout(title = "Biomass by Aspect",
+            legend.outside = TRUE,
+            legend.outside.size = 0.25) +
+  tm_text("Plot", ymod = -1.5, size = 1.2) +
+  tm_scale_bar()
+
 
 

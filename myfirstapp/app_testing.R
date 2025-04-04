@@ -1,32 +1,28 @@
-# Shiny App for Forest Inventory Analysis with Modular Data Loader
-
+install.packages("shiny")
 library(shiny)
+library(bslib)
 library(terra)
 library(tmap)
 library(sf)
 
-source("func_Load_Data.R")  # This script must define load_forest_data()
-
-library(bslib)
+source("func_Load_Data.R") # made modular for convenience. 
 
 ui <- page_sidebar(
-  title = "Extract Slope and Aspect",
   sidebar = sidebar(
     textInput("filepath_input", "File Path (Folder Containing Data)", value = "C:/Users/mateuscaltabiano/GitProjects/ForL2_Mat/files/"),
     numericInput("buffer_radius", "Buffer Radius (m)", value = 17.83, step = 0.1),
     actionButton("process", "Process Data")
   ),
-  navset_tab(
-    nav_panel("DEM", tmapOutput("dem_map")),
-    nav_panel("Extract Slope and Aspect",
-              selectInput("layer_select", "Choose an option:",
-                          choices = c("Slope", "Aspect", "Reclassified Aspect"),
-                          selected = "Slope"),
-              tmapOutput("slope_aspect_dynamic")
-    ),
-    nav_panel("Species by Aspect", tmapOutput("species_aspect_map")),
-    nav_panel("Species by Slope", tmapOutput("species_slope_map"))
-  )
+  
+  title = "Extract Slope and Aspect",
+  tmapOutput("dem_map"),
+  tabPanel("Extract Slope and Aspect",
+           selectInput("layer_select", "Choose an option:",
+                       choices = c("Slope", "Aspect", "Reclassified Aspect"),
+                       selected = "Slope"),
+           tmapOutput("slope_aspect_dynamic")),
+  tabPanel("Species by Aspect", tmapOutput("species_aspect_map")),
+  tabPanel("Species by Slope", tmapOutput("species_slope_map"))
 )
 
 server <- function(input, output, session) {
@@ -50,22 +46,23 @@ server <- function(input, output, session) {
     tm_shape(data$dem) + tm_raster(title = "DEM")
   })
   
-  output$slope_aspect_dynamic <- renderTmap({
-    req(input$layer_select)
-    if (input$layer_select == "Slope") {
-      req(data$slope)
-      tm_shape(data$slope) + tm_raster(style = "cont", title = "Slope (deg)")
-    } else if (input$layer_select == "Aspect") {
-      req(data$aspect)
-      tm_shape(data$aspect) + tm_raster(style = "cont", title = "Aspect (deg)")
-    } else if (input$layer_select == "Reclassified Aspect") {
-      req(data$asp_class)
-      tm_shape(data$asp_class) +
-        tm_raster(style = "cat",
-                  palette = c("white", "blue", "green", "yellow", "red"),
-                  labels = c(NA, "North", "East", "South", "West"),
-                  alpha = 0.2)
-    }
+  output$slope_map <- renderTmap({
+    req(data$slope)
+    tm_shape(data$slope) + tm_raster(style = "cont", title = "Slope (deg)")
+  })
+  
+  output$aspect_map <- renderTmap({
+    req(data$aspect)
+    tm_shape(data$aspect) + tm_raster(style = "cont", title = "Aspect (deg)")
+  })
+  
+  output$asp_class_map <- renderTmap({
+    req(data$asp_class)
+    tm_shape(data$asp_class) +
+      tm_raster(style = "cat",
+                palette = c("white", "blue", "green", "yellow", "red"),
+                labels = c(NA, "North", "East", "South", "West"),
+                alpha = 0.2)
   })
   
   output$species_aspect_map <- renderTmap({
@@ -91,4 +88,4 @@ server <- function(input, output, session) {
   })
 }
 
-shinyApp(ui, server)
+shinyApp(ui, server)  
